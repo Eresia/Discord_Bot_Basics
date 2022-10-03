@@ -83,7 +83,7 @@ function writeInData(guildId)
 		fs.unlinkSync(path);
 	}
 
-	fs.writeFileSync(path, JSON.stringify(data[guildId]), 'utf8');
+	fs.writeFileSync(path, JSON.stringify(data[guildId], null, 4), 'utf8');
 }
 
 function writeInAllData()

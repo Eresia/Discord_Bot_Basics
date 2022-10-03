@@ -4,8 +4,28 @@ const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const DataManager = require('./scripts/data-manager.js');
-const { clientId, token } = require('./config.json');
 const DiscordUtils = require('./scripts/discord-utils.js');
+const { exit } = require('process');
+
+if(!fs.existsSync('config.json'))
+{
+	let basic_config = {};
+	basic_config.clientId = "";
+	basic_config.token = "";
+
+	fs.writeFileSync('config.json', JSON.stringify(basic_config, null, 4));
+
+	console.log('Need to fill config.json with discord bot informations');
+	exit(0);
+}
+
+const { clientId, token } = require('./config.json');
+
+if(clientId.length == 0 || token.length == 0)
+{
+	console.log('Need to fill config.json with discord bot informations');
+	exit(0);
+}
 
 const needRefreshCommands = true;
 const sendInitError = true;
