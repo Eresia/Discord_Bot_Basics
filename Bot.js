@@ -40,7 +40,8 @@ const client = new Client({ intents:
 	[
 		GatewayIntentBits.Guilds,
 		GatewayIntentBits.GuildMembers,
-		GatewayIntentBits.GuildMessages
+		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.GuildMessageReactions
 	] 
 });
 
@@ -71,7 +72,7 @@ client.on('ready', async function () {
 
 	await refreshCommands();
 
-	client.on('interactionCreate', async function(interaction)
+	client.on(Events.InteractionCreate, async function(interaction)
 	{
 		if(!interaction.isCommand())
 		{
@@ -111,13 +112,13 @@ client.on('ready', async function () {
 		}
 	});
 
-	client.on('guildCreate', function(guild)
+	client.on(Events.GuildCreate, function(guild)
 	{
 		DataManager.initGuildData(guild.id);
 		refreshCommandForGuild(guild);
 	});
 
-	client.on('guildDelete', function(guild)
+	client.on(Events.GuildDelete, function(guild)
 	{
 		DataManager.removeGuildData(guild.id);
 	});
