@@ -100,8 +100,8 @@ allCommands.push({
 
 			let field = 
 			{
-				title: (fieldTitle == null) ? emptyMessage : fieldTitle.replaceAll('\\n', '\n'),
-				description: (fieldDescription == null) ? emptyMessage : fieldDescription.replaceAll('\\n', '\n'),
+				name: (fieldTitle == null) ? emptyMessage : fieldTitle.replaceAll('\\n', '\n'),
+				value: (fieldDescription == null) ? emptyMessage : fieldDescription.replaceAll('\\n', '\n'),
 				inline: (fieldInline == null) ? false : fieldInline
 			}
 
@@ -118,9 +118,9 @@ allCommands.push({
 			embed.setDescription(description.replaceAll('\\n', '\n'));
 		}
 
-		for(let i = 0; i < fields.length; i++)
+		if(fields.length != 0)
 		{
-			embed.addField(fields[i].title, fields[i].description, fields[i].inline);
+			embed.addFields(fields);
 		}
 
 		if(embed.length == 0)
