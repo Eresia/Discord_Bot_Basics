@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const { Client, Collection, GatewayIntentBits } = require('discord.js');
+const { Client, Events, Collection, GatewayIntentBits } = require('discord.js');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const DataManager = require('./scripts/data-manager.js');
