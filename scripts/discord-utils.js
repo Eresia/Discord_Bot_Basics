@@ -183,7 +183,14 @@ async function getMessageById(client, channelId, messageId)
 		return null;
 	}
 
-	return channel.messages.fetch(messageId);
+	try
+	{
+		return await channel.messages.fetch(messageId);
+	}
+	catch(error)
+	{
+		return null;
+	}
 }
 
 function hasMemberRole(guildMember, roleId)
