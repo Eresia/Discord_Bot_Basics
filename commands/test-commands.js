@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const DiscordUtils = require('../scripts/discord-utils.js');
 
 let allCommands = [];
