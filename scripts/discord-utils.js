@@ -30,24 +30,14 @@ async function getMemberById(guild, id)
 	return members.get(id);
 }
 
-function getRoleById(guild, id)
+async function getRoleById(guild, id)
 {
-	for(let i = 0; i < guild.roles.cache.size; i++)
-	{
-		let role = guild.roles.cache.at(i);
-
-		if(role.id == id)
-		{
-			return role;
-		}
-	}
-
-	return null;
+	return await guild.roles.fetch(id);
 }
 
 async function getUserNameById(guild, id)
 {
-	let member = await module.exports.getMemberById(guild, id);
+	let member = await getMemberById(guild, id);
 	let result = "Unknow";
 
 	if(member == null)
@@ -69,7 +59,7 @@ async function getUserNameById(guild, id)
 
 async function getUserBaseNameById(guild, id)
 {
-	let user = await module.exports.getMemberById(guild, id);
+	let user = await getMemberById(guild, id);
 
 	if(user == null)
 	{
@@ -81,7 +71,7 @@ async function getUserBaseNameById(guild, id)
 
 async function getUserTagById(guild, id)
 {
-	let user = await module.exports.getMemberById(guild, id);
+	let user = await getMemberById(guild, id);
 
 	if(user == null)
 	{
@@ -91,9 +81,9 @@ async function getUserTagById(guild, id)
 	return user.user.tag;
 }
 
-function getRoleNameById(guild, id)
+async function getRoleNameById(guild, id)
 {
-	let role = module.exports.getRoleById(guild, id);
+	let role = await getRoleById(guild, id);
 
 	if(role == null)
 	{
@@ -183,14 +173,18 @@ async function getMessageById(client, channelId, messageId)
 		return null;
 	}
 
+	let message;
+
 	try
 	{
-		return await channel.messages.fetch(messageId);
+		message = await channel.messages.fetch(messageId);
 	}
 	catch(error)
 	{
-		return null;
+		message = null;
 	}
+
+	return message;
 }
 
 function hasMemberRole(guildMember, roleId)
