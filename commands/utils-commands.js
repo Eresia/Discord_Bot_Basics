@@ -161,6 +161,23 @@ allCommands.push({
 				subcommand
 					.setName('channel')
 					.setDescription('Purge all message of a channel')
+					.addBooleanOption(option =>
+						option
+							.setName('replace-channel')
+							.setDescription('Delete and recreate channel')
+							.setRequired(false)
+					)
+				)
+			.addSubcommand(subcommand =>
+				subcommand
+					.setName('threads')
+					.setDescription('Purge all threads of a channel')
+					.addBooleanOption(option =>
+						option
+							.setName('only-closed')
+							.setDescription('Delete Only closed threads')
+							.setRequired(true)
+					)
 				),
 
 	async execute(interaction, dataManager) {
@@ -187,7 +204,7 @@ allCommands.push({
 					await interaction.channel.bulkDelete(messages);
 				}
 
-				await interaction.editReply('Remove ' + messages.size + ' messages');
+				await interaction.editReply({content: 'Remove ' + messages.size + ' messages', ephemeral: true });
 				break;
 			}
 
@@ -196,14 +213,60 @@ allCommands.push({
 				let messages = await interaction.channel.messages.fetch({limit: 100});
 				let nbMessages = 0;
 
-				while(messages.size > 0)
-				{
-					nbMessages += messages.size;
-					await interaction.channel.bulkDelete(messages);
-					messages = await interaction.channel.messages.fetch({limit: 100});
-				}
+				let replaceChannel = interaction.options.getBoolean('replace-channel');
+				replaceChannel = (replaceChannel == null) ? false : replaceChannel;
 
-				await interaction.editReply('Remove ' + nbMessages + ' messages');
+				if(replaceChannel != null && replaceChannel)
+				{
+					let newChannel = await interaction.channel.clone(interaction.channel.name);
+					await interaction.channel.delete();
+				}
+				else
+				{
+					while(messages.size > 0)
+					{
+						nbMessages += messages.size;
+						await interaction.channel.bulkDelete(messages);
+						messages = await interaction.channel.messages.fetch({limit: 100});
+					}
+
+					await interaction.editReply({content: 'Remove ' + nbMessages + ' messages', ephemeral: true });
+				}
+				
+				break;
+			}
+
+			case 'threads':
+			{
+				let hasMoreThreads;
+				let onlyClosed = interaction.options.getBoolean('only-closed');
+				let nbThreadRemoved = 0;
+
+				do
+				{
+					let fetchedThreads = await interaction.channel.threads.fetchArchived({type: 'private', fetchAll: true}, false);
+					let threads = Array.from(fetchedThreads.threads.values());
+					hasMoreThreads = fetchedThreads.hasMore;
+
+					fetchedThreads = await interaction.channel.threads.fetchArchived({type: 'public'}, false);
+					threads = threads.concat(Array.from(fetchedThreads.threads.values()));
+					hasMoreThreads = hasMoreThreads || fetchedThreads.hasMore;
+					
+					if(!onlyClosed)
+					{
+						fetchedThreads = await interaction.channel.threads.fetchActive(false);
+						threads = threads.concat(Array.from(fetchedThreads.threads.values()));
+						hasMoreThreads = hasMoreThreads || fetchedThreads.hasMore;
+					}
+
+					for(let i = 0; i < threads.length; i++)
+					{
+						nbThreadRemoved++;
+						await threads[i].delete();
+					}
+				} while(hasMoreThreads);
+				
+				await interaction.editReply({content: 'Remove ' + nbThreadRemoved + ' threads', ephemeral: true });
 				break;
 			}
 		}
