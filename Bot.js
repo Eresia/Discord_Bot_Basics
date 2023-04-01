@@ -215,6 +215,11 @@ async function refreshCommandForGuild(guild)
 
 async function logError(guild, error)
 {
+	if(guild == null)
+	{
+		return;
+	}
+	
 	let guildData = DataManager.getServerData(guild.id);
 	let channel = await DiscordUtils.getChannelById(guild.client, guildData.errorLogChannel);
 
