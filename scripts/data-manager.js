@@ -20,6 +20,11 @@ function initData(dirName, defaultValues, callBack = null)
 
 	let directoryFiles = fs.readdirSync(directoryPath);
 	directoryFiles.forEach(function (file) {
+		if(fs.lstatSync(directoryPath + '/' + file).isDirectory())
+		{
+			return;
+		}
+
 		let contents = fs.readFileSync(directoryPath + '/' + file, 'utf8');
 		let temp = JSON.parse(contents);
 		data[temp.guildId] = temp;

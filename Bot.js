@@ -11,6 +11,7 @@ if(!fs.existsSync('config.json'))
 	let basic_config = {};
 	basic_config.clientId = "";
 	basic_config.token = "";
+	basic_config.errorLogGuild = "";
 
 	fs.writeFileSync('config.json', JSON.stringify(basic_config, null, 4));
 
@@ -18,23 +19,48 @@ if(!fs.existsSync('config.json'))
 	exit(0);
 }
 
-const { clientId, token } = require('./config.json');
+const config = JSON.parse(fs.readFileSync('./config.json'));
 
-if(clientId.length == 0 || token.length == 0)
+if(!('clientId' in config) || !('token' in config))
+{
+	if(!('clientId' in config))
+	{
+		config.clientId = "";
+	}
+
+	if(!('token' in config))
+	{
+		config.token = "";
+	}
+
+	fs.writeFileSync('config.json', JSON.stringify(config, null, 4));
+	console.log('Need to fill config.json with discord bot informations');
+	return;
+}
+
+if(config.clientId.length == 0 || config.token.length == 0)
 {
 	console.log('Need to fill config.json with discord bot informations');
 	exit(0);
 }
 
+if(!('errorLogGuild' in config) || config.errorLogGuild.length == 0)
+{
+	config.errorLogGuild = "";
+	fs.writeFileSync('config.json', JSON.stringify(config, null, 4));
+	console.log('No error log guild specified');
+}
+
 const needRefreshCommands = true;
 const sendInitError = true;
+const caughtException = true;
 
 const guildValues = 
 [
 	{name : 'errorLogChannel', defaultValue : -1},
 ];
 
-const rest = new REST({ version: '9' }).setToken(token);
+const rest = new REST({ version: '9' }).setToken(config.token);
 const client = new Client({ intents: 
 	[
 		GatewayIntentBits.Guilds,
@@ -48,6 +74,7 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 
 client.commands = new Collection();
 let commandData = [];
+let dynamicCommandData = [];
 
 for (const file of commandFiles) {
 	let commands = require(`./commands/${file}`);
@@ -55,8 +82,16 @@ for (const file of commandFiles) {
 
 	for(let i = 0; i < allCommands.length; i++)
 	{
+		if('dynamicCommandCreator' in allCommands[i])
+		{
+			dynamicCommandData.push({name: allCommands[i].data.name, creator: allCommands[i].dynamicCommandCreator});
+		}
+		else
+		{
+			commandData.push(allCommands[i].data.toJSON());
+		}
+
 		client.commands.set(allCommands[i].data.name, allCommands[i]);
-		commandData.push(allCommands[i].data.toJSON());
 	}
 }
 
@@ -64,7 +99,7 @@ DataManager.initData(path.join(__dirname, 'data'), guildValues);
 
 let isInit = false;
 
-client.on('ready', async function () {
+client.on(Events.ClientReady, async function () {
 	console.log("Connected");
 
 	if (!client.application?.owner) await client.application?.fetch();
@@ -73,7 +108,7 @@ client.on('ready', async function () {
 
 	client.on(Events.InteractionCreate, async function(interaction)
 	{
-		if(!interaction.isCommand())
+		if(!interaction.isCommand() && !interaction.isUserContextMenuCommand())
 		{
 			return;
 		}
@@ -94,18 +129,18 @@ client.on('ready', async function () {
 			try 
 			{
 				await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-				DataManager.logError(interaction.guild, 'Command Error :\n\n' + executionError);
+				DataManager.logError(interaction.guild, 'Command ' + interaction.commandName + ' Error :\n\n' + executionError);
 			} 
 			catch(replyError)
 			{
 				try 
 				{
 					await interaction.editReply('There was an error while executing this command!');
-					DataManager.logError(interaction.guild, 'Command Error :\n\n' + replyError);
+					DataManager.logError(interaction.guild, 'Command ' + interaction.commandName + ' Error :\n\n' + replyError + '\n' + executionError);
 				}
 				catch(cantReplyError)
 				{
-					DataManager.logError(interaction.guild, 'Answer is too long');
+					DataManager.logError(interaction.guild, 'Command ' + interaction.commandName + ' Error : Answer is too long');
 				}
 			}
 		}
@@ -132,7 +167,7 @@ client.on('ready', async function () {
 	client.guilds.cache.forEach(async (guild) => {
 		if(sendInitError)
 		{
-			DataManager.logError(guild, 'Init error');
+			DataManager.logError(guild, 'Bot Starting');
 		}
 	});
 	
@@ -155,9 +190,21 @@ async function refreshCommands()
 
 async function refreshCommandForGuild(guild)
 {
+	let guildCommandData = commandData.map(x => x);
+	for(let i = 0; i < dynamicCommandData.length; i++)
+	{
+		let data = dynamicCommandData[i].creator(dynamicCommandData[i].name, DataManager, guild);
+		if(data == null)
+		{
+			continue;
+		}
+
+		guildCommandData.push(data.toJSON());
+	}
+
 	try
 	{
-		await rest.put(Routes.applicationGuildCommands(clientId, guild.id), { body: commandData });
+		await rest.put(Routes.applicationGuildCommands(config.clientId, guild.id), { body: guildCommandData });
 		console.log('Successfully registered application commands for guild ' + guild.name);
 	}
 	catch(error)
@@ -173,11 +220,28 @@ async function logError(guild, error)
 
 	if(channel != null)
 	{
-		channel.send('Info: ' + error);
+		try
+		{
+			await channel.send('Info: ' + error);
+		}
+		catch(error)
+		{
+			console.log('Can\'t log error : ' + error);
+		}
 	}
+}
+
+if(caughtException && config.errorLogGuild.length > 0)
+{
+	process.once('uncaughtException', async function (err)
+	{
+		await DataManager.logError(await DiscordUtils.getGuildById(client, config.errorLogGuild), 'Uncaught exception: ' + err);
+		console.log('Uncaught exception: ' + err);
+		exit(1);
+	});
 }
 
 DataManager.refreshCommandForGuild = refreshCommandForGuild;
 DataManager.logError = logError;
 
-client.login(token);
+client.login(config.token);
