@@ -20,8 +20,9 @@ async function setChannel(interaction, dataManager, channelDescription, channelN
 
 let allChannelCommands = {
 	data: new SlashCommandBuilder()
-				.setName("channel")
-				.setDescription('Set gestion channels'),
+		.setDefaultMemberPermissions(0)
+		.setName("channel")
+		.setDescription('Set gestion channels'),
 
 	commandChannels : {},
 

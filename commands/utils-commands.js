@@ -8,6 +8,7 @@ const nbMaxEmbedField = 7;
 function buildEmbedCommand()
 {
 	let command = new SlashCommandBuilder();
+	command.setDefaultMemberPermissions(0);
 	command.setName('embed');
 	command.setDescription('Add embed message');
 	command.addStringOption(option => 
@@ -145,6 +146,7 @@ allCommands.push({
 allCommands.push({
 	data: new SlashCommandBuilder()
 			.setName('purge')
+			.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
 			.setDescription('Purge messages')
 			.addSubcommand(subcommand =>
 				subcommand
