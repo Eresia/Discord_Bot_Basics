@@ -51,9 +51,17 @@ if(!('errorLogGuild' in config) || config.errorLogGuild.length == 0)
 	console.log('No error log guild specified');
 }
 
-const needRefreshCommands = true;
-const sendInitError = true;
-const caughtException = true;
+if(!('sendInitError' in config))
+{
+	config.sendInitError = true;
+	fs.writeFileSync('config.json', JSON.stringify(config, null, 4));
+}
+
+if(!('caughtException' in config))
+{
+	config.caughtException = true;
+	fs.writeFileSync('config.json', JSON.stringify(config, null, 4));
+}
 
 const guildValues = 
 [
@@ -165,7 +173,7 @@ client.on(Events.ClientReady, async function () {
 	}
 
 	client.guilds.cache.forEach(async (guild) => {
-		if(sendInitError)
+		if(config.sendInitError)
 		{
 			DataManager.logError(guild, 'Bot Starting');
 		}
@@ -236,7 +244,7 @@ async function logError(guild, error)
 	}
 }
 
-if(caughtException && config.errorLogGuild.length > 0)
+if(config.caughtException && config.errorLogGuild.length > 0)
 {
 	process.once('uncaughtException', async function (err)
 	{
