@@ -49,6 +49,10 @@ async function getUserNameById(guild, id)
 	{
 		result = member.nickname;
 	}
+	else if(("globalName" in member.user) && (member.user.globalName != null))
+	{
+		result = member.user.globalName;
+	}
 	else
 	{
 		result = member.user.username;
