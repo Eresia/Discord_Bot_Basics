@@ -1,7 +1,7 @@
-const { SlashCommandBuilder } = require('discord.js');
-const DiscordUtils = require('../scripts/discord-utils.js');
+import { SlashCommandBuilder } from 'discord.js';
+import * as DiscordUtils from '../scripts/discord-utils.js';
 
-let allCommands = [];
+export let allCommands = [];
 
 async function setChannel(interaction, dataManager, channelDescription, channelName, callback)
 {
@@ -61,8 +61,3 @@ function addChannelCommand(command, channelDescription, channelName, callback = 
 addChannelCommand('error-log-channel', 'error log channel', 'errorLogChannel');
 
 allCommands.push(allChannelCommands);
-
-module.exports = 
-{
-	allCommands
-};

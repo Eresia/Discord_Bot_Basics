@@ -1,6 +1,6 @@
-const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
+import { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } from 'discord.js';
 
-let allCommands = [];
+export let allCommands = [];
 
 const emptyMessage = "\u200B";
 const nbMaxEmbedField = 7;
@@ -274,7 +274,3 @@ allCommands.push({
 		}
 	}
 });
-
-module.exports = {
-	allCommands
-};

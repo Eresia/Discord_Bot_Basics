@@ -1,13 +1,13 @@
-const { EmbedBuilder } = require('discord.js');
+import { EmbedBuilder } from 'discord.js';
 
 let reactNumberArray = ["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"];
 
-function getUserStringById(id)
+export function getUserStringById(id)
 {
 	return "<@!" + id + ">";
 }
 
-async function getGuildById(client, id)
+export async function getGuildById(client, id)
 {
 	await client.guilds.fetch();
 
@@ -24,18 +24,18 @@ async function getGuildById(client, id)
 	return null;
 }
 
-async function getMemberById(guild, id)
+export async function getMemberById(guild, id)
 {
 	let members = await guild.members.fetch();
 	return members.get(id);
 }
 
-async function getRoleById(guild, id)
+export async function getRoleById(guild, id)
 {
 	return await guild.roles.fetch(id);
 }
 
-async function getUserNameById(guild, id)
+export async function getUserNameById(guild, id)
 {
 	let member = await getMemberById(guild, id);
 	let result = "Unknow";
@@ -61,7 +61,7 @@ async function getUserNameById(guild, id)
 	return result;
 }
 
-async function getUserBaseNameById(guild, id)
+export async function getUserBaseNameById(guild, id)
 {
 	let user = await getMemberById(guild, id);
 
@@ -73,7 +73,7 @@ async function getUserBaseNameById(guild, id)
 	return user.user.username;
 }
 
-async function getUserTagById(guild, id)
+export async function getUserTagById(guild, id)
 {
 	let user = await getMemberById(guild, id);
 
@@ -85,7 +85,7 @@ async function getUserTagById(guild, id)
 	return user.user.tag;
 }
 
-async function getRoleNameById(guild, id)
+export async function getRoleNameById(guild, id)
 {
 	let role = await getRoleById(guild, id);
 
@@ -97,12 +97,12 @@ async function getRoleNameById(guild, id)
 	return role.name;
 }
 
-function getRoleStringById(id)
+export function getRoleStringById(id)
 {
 	return "<@&" + id + ">";
 }
 
-function getUserIdByString(string)
+export function getUserIdByString(string)
 {
 	let result = -1;
 
@@ -124,7 +124,7 @@ function getUserIdByString(string)
 	return result;
 }
 
-function getRoleIdByString(string)
+export function getRoleIdByString(string)
 {
 	let result = -1;
 
@@ -138,7 +138,7 @@ function getRoleIdByString(string)
 	return result;
 }
 
-async function getChannelById(client, id)
+export async function getChannelById(client, id)
 {
 	try
 	{
@@ -150,12 +150,12 @@ async function getChannelById(client, id)
 	}
 }
 
-function getChannelStringById(id)
+export function getChannelStringById(id)
 {
 	return "<#" + id + ">";
 }
 
-function getChannelIdByString(string)
+export function getChannelIdByString(string)
 {
 	let result = -1;
 
@@ -169,7 +169,7 @@ function getChannelIdByString(string)
 	return result;
 }
 
-async function getMessageById(client, channelId, messageId)
+export async function getMessageById(client, channelId, messageId)
 {
 	let channel = await getChannelById(client, channelId);
 	if(channel == null)
@@ -191,7 +191,7 @@ async function getMessageById(client, channelId, messageId)
 	return message;
 }
 
-function hasMemberRole(guildMember, roleId)
+export function hasMemberRole(guildMember, roleId)
 {
 	for(let i = 0; i < guildMember.roles.cache.size; i++)
 	{
@@ -206,14 +206,14 @@ function hasMemberRole(guildMember, roleId)
 	return false;
 }
 
-function createEmbedMessage(message, color = null)
+export function createEmbedMessage(message, color = null)
 {
 	let embed = new EmbedBuilder();
 	embed.setDescription(message);
 	return embed;
 }
 
-async function editMessageById(client, channelId, messageId, newMessage)
+export async function editMessageById(client, channelId, messageId, newMessage)
 {
 	let message = await getMessageById(client, channelId, messageId);
 
@@ -228,31 +228,7 @@ async function editMessageById(client, channelId, messageId, newMessage)
 	}
 }
 
-function getReactFromNumber(number)
+export function getReactFromNumber(number)
 {
 	return reactNumberArray[number];
-}
-
-module.exports = {
-	getUserStringById,
-	getGuildById,
-	getMemberById,
-	getRoleById,
-	getUserNameById,
-	getUserBaseNameById,
-	getUserTagById,
-	getRoleNameById,
-	getRoleStringById,
-	getChannelById,
-	getChannelStringById,
-	getMessageById,
-
-	getUserIdByString,
-	getRoleIdByString,
-	getChannelIdByString,
-
-	hasMemberRole,
-	createEmbedMessage,
-	editMessageById,
-	getReactFromNumber,
 }

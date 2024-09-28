@@ -1,4 +1,4 @@
-const fs = require('fs');
+import fs from 'fs';
 let directoryPath = "";
 
 let data = {}
@@ -98,7 +98,7 @@ function writeInAllData()
 	});
 }
 
-module.exports = {
+let DataManager = {
 	getServerData,
 	initData,
 	initGuildData,
@@ -106,3 +106,5 @@ module.exports = {
 	writeInData,
 	writeInAllData
 }
+
+export default DataManager

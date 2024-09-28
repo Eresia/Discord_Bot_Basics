@@ -1,7 +1,7 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
-const DiscordUtils = require('../scripts/discord-utils.js');
+import { SlashCommandBuilder } from 'discord.js';
+import * as DiscordUtils from '../scripts/discord-utils.js';
 
-let allCommands = [];
+export let allCommands = [];
 
 allCommands.push({
 	data: new SlashCommandBuilder()
@@ -92,7 +92,3 @@ allCommands.push({
 		interaction.reply({content: 'Success', ephemeral: true})
 	}
 });
-
-module.exports = {
-	allCommands
-};
