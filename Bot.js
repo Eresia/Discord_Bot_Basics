@@ -109,7 +109,14 @@ async function init()
 		}
 	}
 
-	DataManager.initData(path.join(path.dirname(import.meta.url), 'data'), guildValues);
+	if(process.platform === 'win32')
+	{
+		DataManager.initData(path.join(import.meta.dirname, 'data'), guildValues);
+	}
+	else
+	{
+		DataManager.initData(path.join(path.dirname(import.meta.url), 'data'), guildValues);
+	}
 
 	let isInit = false;
 
