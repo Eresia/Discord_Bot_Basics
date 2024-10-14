@@ -109,7 +109,7 @@ async function init()
 		}
 	}
 
-	DataManager.initData(path.join(import.meta.dirname, 'data'), guildValues);
+	DataManager.initData(path.join(path.dirname(import.meta.url), 'data'), guildValues);
 
 	let isInit = false;
 
