@@ -1,9 +1,10 @@
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { exit } from 'process';
 import { Client, Events, Collection, GatewayIntentBits, REST, Routes } from 'discord.js';
 import DataManager from './scripts/data-manager.js';
 import * as DiscordUtils from './scripts/discord-utils.js';
-import { exit } from 'process';
 
 const needRefreshCommands = true;
 
@@ -109,14 +110,7 @@ async function init()
 		}
 	}
 
-	if(process.platform === 'win32')
-	{
-		DataManager.initData(path.join(import.meta.dirname, 'data'), guildValues);
-	}
-	else
-	{
-		DataManager.initData(path.join(path.dirname(import.meta.url), 'data'), guildValues);
-	}
+	DataManager.initData(path.join(path.dirname(fileURLToPath(import.meta.url)), 'data'), guildValues);
 
 	let isInit = false;
 

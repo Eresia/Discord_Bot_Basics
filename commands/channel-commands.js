@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 import * as DiscordUtils from '../scripts/discord-utils.js';
 
 export let allCommands = [];
@@ -20,20 +20,14 @@ async function setChannel(interaction, dataManager, channelDescription, channelN
 
 let allChannelCommands = {
 	data: new SlashCommandBuilder()
-		.setDefaultMemberPermissions(0)
 		.setName("channel")
+		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 		.setDescription('Set gestion channels'),
 
 	commandChannels : {},
 
 	async execute(interaction, dataManager) {
 		dataManager.initGuildData(interaction.guild.id);
-
-		if(!interaction.member.permissions.has("ADMINISTRATOR"))
-		{
-			await interaction.reply({ content: 'You don\'t have permission for this command', ephemeral: true });
-			return;
-		}
 
 		let subcommand = interaction.options.getSubcommand();
 
