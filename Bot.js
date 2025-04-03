@@ -31,6 +31,8 @@ async function init()
 		basic_config.clientId = "";
 		basic_config.token = "";
 		basic_config.errorLogGuild = "";
+		basic_config.sendInitError = true;
+		basic_config.caughtException = true;
 
 		fs.writeFileSync('config.json', JSON.stringify(basic_config, null, 4));
 
@@ -193,8 +195,9 @@ async function init()
 	{
 		process.once('uncaughtException', async function (err)
 		{
-			await DataManager.logError(await DiscordUtils.getGuildById(client, config.errorLogGuild), 'Uncaught exception: ' + err);
-			console.log('Uncaught exception: ' + err);
+			await DataManager.logError(await DiscordUtils.getGuildById(client, config.errorLogGuild), 'Uncaught exception: ' + err.message + '\Exception stack: ' + err.stack);
+			console.log('Uncaught exception: ' + err.message);
+			console.log('Exception stack: ' + err.stack);
 			exit(1);
 		});
 	}
