@@ -26,8 +26,15 @@ export async function getGuildById(client, id)
 
 export async function getMemberById(guild, id)
 {
-	let members = await guild.members.fetch();
-	return members.get(id);
+	try
+	{
+		let member = await guild.members.fetch({user: id});
+		return member;
+	}
+	catch
+	{
+		return null;
+	}
 }
 
 export async function getRoleById(guild, id)
